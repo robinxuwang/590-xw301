@@ -53,27 +53,26 @@ class Data:
     
     def optimize_logit():
         def loss(p):
-            weight = p[0]
-            bias = p[1]
             global x_train, y_train   
             loss = []    
-            preds = weight * x_train + bias   
+            preds =p[0] +p[1]*(1/1+np.exp(-(x_train-p[2])/p[3]+0.00001))
             for pred, y in zip(preds, y_train):
                 loss.append((pred - y) ** 2)
                 mse = sum(loss) / len(x_train)
                 return mse
         #TRAIN MODEL USING SCIPY OPTIMIZER
-        res = minimize(loss, [0,0], method='Nelder-Mead', tol=1e-15)
+        res = minimize(loss, [0,0,0,0], method='Nelder-Mead', tol=1e-15)
         popt=res.x
         #print("OPTIMAL PARAM:",popt)        
-        x_de_norm = x_train_norm*x_std_lr +x_mean_lr
+        x_de_norm = x_train_norm*x_std_logit +x_mean_logit
         yp_de_norm = x_de_norm*popt[0] +popt[1]
         plt.scatter(x_train, y_train)
         plt.plot(x_de_norm, yp_de_norm, color='r')
-        plt.xlabel('age')
-        plt.ylabel('weight')
+        plt.xlabel('weight')
+        plt.ylabel('is_adult')
         plt.show()
         return popt
+    
 
 if __name__ == '__main__': 
     df = pd.read_json('weight.json')
@@ -85,5 +84,13 @@ if __name__ == '__main__':
     p = [0,0]     
     x_train_norm, y_train_norm = Data.norm(df_lr['x'],df_lr['y'])
     x_train, x_test, y_train, y_test = Data.split_lr(df_lr['x'],df_lr['y'])
-    Data.optimize_lr() 
+    Data.optimize_lr()
+    x_mean_logit = np.mean(df['y'])
+    y_mean_logit = np.mean(df['is_adult'])
+    x_std_logit = np.std(df['y'])
+    y_std_logit = np.std(df['is_adult'])
+    p = [0,0,0,0]
+    x_train_norm, y_train_norm = Data.norm(df['y'],df['is_adult'])
+    x_train, x_test, y_train, y_test = Data.split_lr(df['y'],df['is_adult'])
+    Data.optimize_logit()
  
