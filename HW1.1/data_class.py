@@ -65,7 +65,7 @@ class Data:
         popt=res.x
         #print("OPTIMAL PARAM:",popt)        
         x_de_norm = x_train_norm*x_std_logit +x_mean_logit
-        yp_de_norm = x_de_norm*popt[0] +popt[1]
+        yp_de_norm =popt[0] +popt[1]*(1/1+np.exp(-(x_de_norm-popt[2])/popt[3]+0.00001))
         plt.scatter(x_train, y_train)
         plt.plot(x_de_norm, yp_de_norm, color='r')
         plt.xlabel('weight')
