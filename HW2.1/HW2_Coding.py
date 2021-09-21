@@ -54,7 +54,7 @@ def model(x,p):
     return  p[0]+p[1]*(1.0/(1.0+np.exp(-(x-p[2])/(p[3]+0.01))))
 
 #SAVE HISTORY FOR PLOTTING AT THE END
-iteration=0; iterations=[]; loss_train=[];  loss_val=[]
+iter=0; iterations=[]; loss_train=[];  loss_val=[]
 
 def predict(p):
     global YPRED_T,YPRED_V,MSE_T, MSE_V
@@ -65,7 +65,7 @@ def predict(p):
 
 #LOSS FUNCTION
 def loss(p, tidx_use, vidx_use):
-    global iterations,loss_train,loss_val,iteration
+    global iterations,loss_train,loss_val,iter
 
     #LOSS Function - train
     yp=model(x[tidx_use],p) #model predictions for given parameterization p
@@ -78,12 +78,12 @@ def loss(p, tidx_use, vidx_use):
     #RECORD FOR PLOTING
     loss_train.append(training_loss)
     loss_val.append(validation_loss)
-    iterations.append(iteration); iteration+=1
+    iterations.append(iter); iter+=1
 
     return training_loss
 
 def a_loss(p, idx_use,result_list):
-    global iterations,loss_train,loss_val,iteration
+    global iterations,loss_train,loss_val,iter
 
     #LOSS Function 
     yp=model(x[idx_use],p) #model predictions for given parameterization p
@@ -107,8 +107,8 @@ def optimizer(f, po):
     dx = 0.0001
     max_iter = 50000
     LR = 0.001
-    method = 'batch'
-    #method = 'mini-batch'
+    #method = 'batch'
+    method = 'mini-batch'
     #method = 'stochastic'
     NDIM = len(po)
     mom = 0.03
@@ -149,9 +149,9 @@ def optimizer(f, po):
                 xip1=po-LR*df_dx
             if (algo == 'MOM'):
                 xip1=po-LR*df_dx + mom*dx  
-            if(iteration%1==0):
+            if(iter%1==0):
                 predict(po)
-                print(iteration,"    ",epoch,"    ",MSE_T,"    ",MSE_V)                        
+                print(iter,"    ",epoch,"    ",MSE_T,"    ",MSE_V)                        
             po = xip1
             iter += 1
                                    
@@ -180,7 +180,7 @@ def optimizer(f, po):
                 xip1=po-LR*df_dx
             if (algo == 'MOM'):
                 xip1=po-LR*df_dx + mom*dx  
-            if(iteration%1==0):
+            if(iter%1==0):
                 predict(po)                               
             po = xip1        
             for i in range(0,NDIM):
@@ -197,11 +197,11 @@ def optimizer(f, po):
                 xip1=po-LR*df_dx
             if (algo == 'MOM'):
                 xip1=po-LR*df_dx + mom*dx  
-            if(iteration%1==0):
+            if(iter%1==0):
                 predict(po)
                 
             po = xip1
-            print(iteration,"    ",epoch,"    ",MSE_T,"    ",MSE_V)
+            print(iter,"    ",epoch,"    ",MSE_T,"    ",MSE_V)
             iter += 1
             
             
@@ -244,7 +244,7 @@ def optimizer(f, po):
                     xip1=po-LR*df_dx
                 if (algo == 'MOM'):
                     xip1=po-LR*df_dx + mom*dx  
-                if(iteration%1==0):
+                if(iter%1==0):
                     predict(po)
                     print(iter,"    ",epoch,"    ",MSE_T,"    ",MSE_V) 
             print('step3')                       
