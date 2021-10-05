@@ -39,8 +39,8 @@ k = 0
 layers = [-1,5,5,5,1]
 activation = 'TANH'
 #activation = 'SIGMOID'
-regularization = 'L1'
-#regularization = 'L2'
+#regularization = 'L1'
+regularization = 'L2'
 
 #TAKES A LONG VECTOR W OF WEIGHTS AND BIAS AND RETURNS WEIGHT AND BIAS SUBMATRICES
 def extract_submatrices(WB):
@@ -166,19 +166,18 @@ print("test_idx shape:" ,test_idx.shape)
 
 ### define the ann forward function    
 def ANN(x,submatrices):
-    global k
-    z1=x.transpose()
+    z=x.transpose()
     for i in range(len(layers)-1):
         index=2*i
-        z1=np.matmul(submatrices[index],z1)+submatrices[index+1]
-        if i == len(layers)-1:
-            z1 = z1
+        z=np.matmul(submatrices[index],z)+submatrices[index+1]
+        if i == len(layers)-2:
+            z = z
         else:
             if activation=='TANH':
-                z1= np.tanh(z1)
+                z= np.tanh(z)
             elif activation=='SIGMOID':
-                z1= S(z1)
-    return z1.transpose()
+                z= S(z)
+    return z.transpose()
 
 def model(x,p):
     if(model_type=="linear" or model_type=="logistic" ):   
