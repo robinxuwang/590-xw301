@@ -7,7 +7,6 @@ import os, shutil
 from keras import layers
 from keras import models
 from keras import optimizers
-from keras.applications.vgg16 import VGG16
 import matplotlib.pyplot as plt
 import numpy as np
 from keras.preprocessing.image import ImageDataGenerator
@@ -66,7 +65,7 @@ for fname in fnames:
 fnames = ['dog.{}.jpg'.format(i) for i in range(1000)]
 for fname in fnames:
     src = original_dataset_dir + '/'+ fname
-    dst = train_dogs_dir + '/'+ fname
+    dst = train_dogs_dir + '/' + fname
     shutil.copyfile(src, dst)
     
     
@@ -90,7 +89,7 @@ for fname in fnames:
 #initialize sequential model
 model = models.Sequential()
 
-#add layers to the model
+#add layers needed to the model
 model.add(layers.Conv2D(32, (3, 3), activation='relu',
 input_shape=(150, 150, 3)))
 model.add(layers.MaxPooling2D((2, 2)))
@@ -104,6 +103,8 @@ model.add(layers.Flatten())
 model.add(layers.Dense(512, activation='relu'))
 model.add(layers.Dense(1, activation='sigmoid'))
 
+
+#model.summary()
 model.compile(loss='binary_crossentropy',optimizer=optimizers.RMSprop(lr=1e-4),metrics=['acc'])
 
 train_datagen = ImageDataGenerator(rescale=1./255)
@@ -145,8 +146,6 @@ plt.title('Training and validation loss')
 plt.legend()
 plt.show()
 
-
-
 #-------------------------------------------------
 #skips data augmaentation and feature extraction
 #-------------------------------------------------
@@ -157,7 +156,6 @@ img = image.load_img(img_path,target_size = (150,150))
 img_tensor = image.img_to_array(img)
 img_tensor = np.expand_dims(img_tensor,axis = 0)
 img_tensor /= 255 
-
 
 plt.imshow(img_tensor[0])
 plt.show()
@@ -176,14 +174,11 @@ for layer in model.layers[:4]:
 
 images_per_row = 8
 for layer_name, layer_activation in zip(layer_names, activations):
-    #number of features in the feature map
-    n_features = layer_activation.shape[-1]
-    # The feature map has shape (1,size,size,number of features)
-    size = layer_activation.shape[1]
-    # tiles the activation channels in this matrix 
-    n_cols = n_features // images_per_row
-    display_grid = np.zeros((size * n_cols, images_per_row * size))
-    #Tiles each filter into a big horizontal grid 
+    n_features = layer_activation.shape[-1]    #how many features in the feature map
+    size = layer_activation.shape[1] 
+    n_cols = n_features // images_per_row  # tiles the activation channels in this matrix 
+    display_grid = np.zeros((size * n_cols, images_per_row * size))   #tiles each filter into a horizontal grid 
+
     for col in range(n_cols):
         for row in range(images_per_row):
             channel_image = layer_activation[0, :, :, col * images_per_row+row]
@@ -192,8 +187,7 @@ for layer_name, layer_activation in zip(layer_names, activations):
             channel_image *= 64
             channel_image += 128
             channel_image = np.clip(channel_image, 0, 255).astype('uint8')
-            display_grid[col*size: (col + 1) * size,
-                         row*size: (row + 1)*size] = channel_image
+            display_grid[col*size: (col + 1) * size, row*size: (row + 1)*size] = channel_image
     scale = 1. / size
     plt.figure(figsize=(scale*display_grid.shape[1], scale*display_grid.shape[0]))
     plt.title(layer_name)
