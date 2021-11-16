@@ -99,11 +99,11 @@ predict_result = model.predict(train_fashion_img)
 #loop through the data to find any data points that is beyond the threshold
 count = 0  
 for i in range(train_fashion_img.shape[0]):
-    if np.mean((train_fashion_img[i] - predict_result[i])**2) > threshold:
+    error = np.mean((train_fashion_img[i] - predict_result[i])**2)  
+    if threshold < error:
         count += 1
         
 print('The number of anomaly in the data is: ',count )
-
 
 
 
